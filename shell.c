@@ -19,6 +19,14 @@ int main(void)
 
 		buffer = read_input();
 		array = tokenize_input(buffer);
+
+		if (strcmp(array[0], "exit") == 0)
+		{
+			free(buffer);
+			free(array);
+			exit(0);
+		}
+
 		path = get_file_path(array[0]);
 
 		create_process(path, array);
