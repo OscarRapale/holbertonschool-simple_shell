@@ -27,7 +27,7 @@ int main(void)
 			exit(0);
 		}
 		if (strcmp(array[0], "env") == 0)
-        {
+		{
 			env(array);
 			continue;
 		}
