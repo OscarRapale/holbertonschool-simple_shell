@@ -8,32 +8,41 @@
 
 int main(void)
 {
-	char *buffer;
+	char *line;
 	char **array;
-	char *path;
 
 	while (1)
 	{
 		if (isatty(STDIN_FILENO))
 			printf("\nuser@simple_shell$ ");
 
-		buffer = read_input();
-		array = tokenize_input(buffer);
+		line = read_input();
+		array = tokenize_input(line);
 
 		if (strcmp(array[0], "exit") == 0)
 		{
-			free(buffer);
+			free(line);
 			free(array);
 			exit(0);
 		}
+		if (strcmp(array[0], "env") == 0)
 
-		path = get_file_path(array[0]);
+		{
 
-		create_process(path, array);
+			env(array);
 
-		free(buffer);
+			free(line);
+
+			free(array);
+
+			continue;
+
+		}
+		create_process(array[0], array);
+
+		free(line);
 		free(array);
 	}
+
 	return (0);
 }
-
