@@ -29,6 +29,8 @@ int main(void)
 		if (strcmp(array[0], "env") == 0)
 		{
 			env(array);
+			free(line);
+			free(array);
 			continue;
 		}
 		path = get_file_path(array[0]);
