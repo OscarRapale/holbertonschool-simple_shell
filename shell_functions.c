@@ -87,21 +87,13 @@ void create_process(char *path, char **array)
  * @array: Array of arguments passed to the function
  */
 
-
 void env(char **array)
-
 {
-
 	int i;
 
-
 	if (array == NULL)
-
 		return;
 
-
 	for (i = 0; environ[i] != NULL; i++)
-
 		printf("%s\n", environ[i]);
-
 }
