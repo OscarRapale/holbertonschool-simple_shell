@@ -75,6 +75,19 @@ char *get_file_path(char *file_name)
 {
 	char *path = getenv("PATH");
 	char *full_path;
+	struct stat st;
+
+	if (strchr(file_name, '/') != NULL)
+	{
+		if (stat(file_name, &st) == 0)
+		{
+			return (strdup(file_name));
+		}
+		else
+		{
+			return (NULL);
+		}
+	}
 
 	if (leading_slash_in_path(file_name) && access(file_name, X_OK) == 0)
 		return (strdup(file_name));
@@ -94,6 +107,4 @@ char *get_file_path(char *file_name)
 	}
 	return (full_path);
 }
-
-
 
