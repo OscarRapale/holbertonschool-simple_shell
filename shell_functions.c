@@ -90,7 +90,7 @@ void create_process(char *path, char **array)
 void env(char **array)
 {
 	int i;
-	
+
 	if (array == NULL)
 		return;
 
