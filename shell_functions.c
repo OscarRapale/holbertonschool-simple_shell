@@ -36,7 +36,17 @@ char **tokenize_input(char *buffer)
 
 	token = strtok(buffer, " \n");
 
+	if (token == NULL)
+	{
+		return (NULL);
+	}
+
 	array = malloc(sizeof(char *) * 1024);
+	if (array == NULL)
+	{
+		return (NULL);
+	}
+
 	i = 0;
 	while (token)
 	{

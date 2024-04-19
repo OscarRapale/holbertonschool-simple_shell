@@ -20,6 +20,12 @@ int main(void)
 		buffer = read_input();
 		array = tokenize_input(buffer);
 
+		if (array == NULL)
+		{
+			free(buffer);
+			continue;
+		}
+
 		if (strcmp(array[0], "exit") == 0)
 		{
 			free(buffer);
