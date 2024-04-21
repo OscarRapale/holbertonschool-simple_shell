@@ -1,8 +1,8 @@
 #include "shell.h"
 
 /**
- * read_inputn - read input from stdin
- * 
+ * read_input - read input from stdin
+ *
  * Return: pointer that points to a string
  * with the input content
  */
@@ -28,4 +28,3 @@ char *read_input(void)
 	}
 	return (input);
 }
-
