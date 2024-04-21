@@ -46,6 +46,5 @@ int new_process(char **args)
 			return (WEXITSTATUS(status));
 		}
 	}
-	return (1);
+	return (-1);
 }
-
