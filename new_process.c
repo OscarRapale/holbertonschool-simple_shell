@@ -23,23 +23,29 @@ int new_process(char **args)
 				fprintf(stderr, "./hsh: 1: %s: not found\n", args[0]);
 				exit(127);
 			}
+			else
+			{
+				perror("error with child process");
+				exit(EXIT_FAILURE);
+			}
 		}
-		else
-		{
-			perror("error with child process");
-			exit(EXIT_FAILURE);
-		}
+		exit(EXIT_SUCCESS);
 	}
 	else if (pid < 0)
 	{
-		perror("error with process: forking");
+		perror("hsh");
 	}
 	else
 	{
 		do {
 			waitpid(pid, &status, WUNTRACED);
 		} while (!WIFEXITED(status) && !WIFSIGNALED(status));
+		if (WIFEXITED(status) && (WEXITSTATUS(status) == 127
+					|| WEXITSTATUS(status) == 2))
+		{
+			return (WEXITSTATUS(status));
+		}
 	}
-	return (-1);
+	return (1);
 }
 
