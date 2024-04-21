@@ -40,16 +40,10 @@ int new_process(char **args)
 		do {
 			waitpid(pid, &status, WUNTRACED);
 		} while (!WIFEXITED(status) && !WIFSIGNALED(status));
-		if (WIFEXITED(status))
+		if (WIFEXITED(status) && (WEXITSTATUS(status) == 127
+					|| WEXITSTATUS(status) == 2))
 		{
-			if (WEXITSTATUS(status) == EXIT_SUCCESS)
-			{
-				return (1);
-			}
-			else
-			{
-				return (WEXITSTATUS(status));
-			}
+			return (WEXITSTATUS(status));
 		}
 	}
 	return (-1);

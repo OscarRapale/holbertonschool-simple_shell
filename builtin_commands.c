@@ -16,7 +16,7 @@ int my_exit(char **args)
 	}
 	else
 	{
-		status = 0;
+		status = 127;
 	}
 	exit(status);
 	return (1);
