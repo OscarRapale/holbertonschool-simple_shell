@@ -5,25 +5,30 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <string.h>
 #include <errno.h>
+#include <fcntl.h>
 
-#define TOK_DELIM " \t\r\n\a\""
-extern char **environ;
 
 /* Prototypes */
-void shell_interactive(void);
-void shell_no_interactive(void);
+
+/* Shell Functions*/
+int leading_slash_in_path(char const *str);
+char *get_file_path(char *file_name);
+char *find_executable_path(char *path, char *file_name);
+void execute_command(char *input, char *argv[], char **env);
 char *read_input(void);
-char **tokenize_input(char *input);
-int execute_commands(char **args);
-int new_process(char **args);
-char *read_stream(void);
+int tokenize_input(char *input, char *args[]);
+char *handle_symbols(char *input);
 
 /* Built-in functions */
-int my_cd(char **args);
-int my_exit(char **args);
-int my_env(char **args);
-int my_help(char **arg);
+int builtin_commands(char **args, int num_args,
+    char *input, char **env);
+void print_env(char **env);
+void handle_cd(char **args, int num_args);
+void handle_exit(char *input, int exit_status);
+int shell_exit(char **args, char *input);
 
 #endif /* SHELL_H */
