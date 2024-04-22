@@ -1,123 +1,104 @@
 #include "shell.h"
 
 /**
- * my_exit - exit the shell
- * @args: list of arguments
- *
- * Return: 1 on success, 0 otherwise
- */
+  * print_env - Prints the environment variables
+  * @env: Arguments
+  */
 
-int my_exit(char **args)
+void print_env(char **env)
 {
-	int status = 0;
-	if (args[1] != NULL)
+	while (*env != NULL)
 	{
-		status = atoi(args[1]);
+		write(1, *env, strlen(*env));
+		write(1, "\n", 1);
+		env++;
 	}
-	else
-	{
-		status = 127;
-	}
-	exit(status);
-	return (1);
 }
 
 /**
- * my_cd - change directories
- * @args: list of arguments
- *
- * Return: 1 on success, 0 otherwise
- */
+  * handle_cd - Handles the cd functionality
+  * @args: Array of commands
+  * @num_args: Argument count
+  */
 
-int my_cd(char **args)
+void handle_cd(char **args, int num_args)
 {
-	if (args[1] == NULL)
+	const char *home_dir, *prev_dir;
+
+	home_dir = getenv("HOME");
+	prev_dir = getenv("OLDPWD");
+
+	if (num_args == 1 || strcmp(args[1], "~") == 0)
 	{
-		fprintf(stderr, "Expected argument to \"cd\"\n");
-		return (1);
+		if (!home_dir)
+		{
+			perror("Home environment not set");
+			return;
+		}
+		if (chdir(home_dir) != 0)
+			perror("cd");
+	}
+	else if (num_args == 2 && strcmp(args[1], "-") == 0)
+	{
+		if (!prev_dir)
+		{
+			perror("OLDPWD environment not set");
+			return;
+		}
+		if (chdir(prev_dir) != 0)
+			perror("cd");
 	}
 	else
 	{
 		if (chdir(args[1]) != 0)
-		{
-			perror("Error");
-			return (1);
-		}
+			perror("cd");
 	}
-	return (1);
 }
 
 /**
- * my_env - prints the environment
- * @args: list of arguments
- *
- * Return: 1 on success, 0 otherwise
- */
+  * handle_exit - Handles the exit functionality
+  * @input: Input value to handle
+  * @exit_status: Exit status of the code
+  */
 
-int my_env(char **args)
+void handle_exit(char *input, int exit_status)
 {
-	char **env = environ;
-	char *value;
+	free(input);
+	exit(exit_status);
+}
+
+/**
+  * shell_exit - Handles the exit status
+  * @args: Arguments to the function
+  * @input: Checks the status of exit
+  *
+  * Return: Status of exit, 1 if otherwise
+  */
+
+int shell_exit(char **args, char *input)
+{
+	char *status_str;
+	int exit_status, i;
 
 	if (args[1] != NULL)
 	{
-		value = getenv(args[1]);
-		if (value == NULL)
+		exit_status = 0;
+		status_str = args[1];
+
+		for (i = 0; status_str[i] != '\0'; i++)
 		{
-			fprintf(stderr, "env: %s not found\n", args[1]);
-			return (1);
+			if (status_str[i] < '0' || status_str[i] > '9')
+			{
+				handle_exit(input, 2);
+				return (1);
+			}
+			exit_status = exit_status * 10 + (status_str[i] - '0');
 		}
-		else
-		{
-			printf("%s=%s\n", args[1], value);
-			return (1);
-		}
-	}
-	while (*env != NULL)
-	{
-		printf("%s\n", *env);
-		env++;
-	}
-
-	return (1);
-}
-
-/**
- * my_help - display help message
- * @args: list of arguments
- *
- * Return: 1 on success, 0 otherwise
- */
-
-int my_help(char **args)
-{
-	if (args[1] == NULL)
-	{
-		printf("Type 'help name' to find out more about the function 'name'.\n");
-		return (1);
-	}
-
-	if (strcmp(args[1], "cd") == 0)
-	{
-		printf("cd [directory] - Change the current directory to [directory]\n");
-	}
-	else if (strcmp(args[1], "env") == 0)
-	{
-		printf("env [name] - Print the value of the environment variable [name]\n");
-	}
-	else if (strcmp(args[1], "help") == 0)
-	{
-		printf("help [command] - Display help for [command], or general help if no command is given\n");
-	}
-	else if (strcmp(args[1], "exit") == 0)
-	{
-		printf("exit [status] - Exit the shell with optional exit status\n");
+		handle_exit(input, exit_status);
 	}
 	else
 	{
-		fprintf(stderr, "Unknown command: %s\n", args[1]);
-		return (1);
+		handle_exit(input, 0);
 	}
 	return (1);
 }
-

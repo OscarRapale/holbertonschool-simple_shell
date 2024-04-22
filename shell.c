@@ -1,22 +1,28 @@
 #include "shell.h"
 
 /**
- * main - Entry point of shell
- *
- * Return: 0 on success
- */
+  * main - main loop
+  * @argc: Argumnt count
+  * @argv: Array of arguments
+  * @env: Environment variable
+  *
+  * Return: O Always succes
+  */
 
-int main(void)
+int main(int argc, char *argv[], char **env)
 {
-	if (isatty(STDIN_FILENO) == 1)
+	char *buffer;
+	(void)argc;
+
+	while (1)
 	{
-		shell_interactive();
-	}
-	else
-	{
-		shell_no_interactive();
+		if (isatty(STDIN_FILENO))
+			printf("user@simple_shell$ ");
+
+		buffer = read_input();
+		execute_command(buffer, argv, env);
+		free(buffer);
 	}
 
 	return (0);
 }
-
