@@ -30,24 +30,81 @@ char *read_input(void)
 
 char **tokenize_input(char *buffer)
 {
-	char *token;
 	char **array;
-	int i;
+	int i = 0;
+	int j = 0;
+	int word_count = 0;
 
-	token = strtok(buffer, " \n");
+	while (line[i] != '\0')
 
-	array = malloc(sizeof(char *) * 1024);
-	i = 0;
-	while (token)
+    {
+	    if (line[i] == ' ')
+
+        {
+		i++;
+		continue;
+
+        }
+	word_count++;
+	while (line[i] != ' ' && line[i] != '\0')
+
+        {
+		i++;
+
+        }
+
+    }
+	array = malloc(sizeof(char *) * (word_count + 1));
+	if (array == NULL)
+
 	{
-		array[i] = token;
-		token = strtok(NULL, " \n");
+		return NULL;
+
+	}
+	i = 0;
+	j = 0;
+	while (line[i] != '\0')
+
+	{
+		if (line[i] == ' ')
+
+		{
+			i++;
+			continue;
+
+		}
+		int word_length = 0;
+		while (line[i] != ' ' && line[i] != '\0')
+
+		{
+			word_length++;
+			i++;
+
+		}
+		array[j] = malloc(sizeof(char) * (word_length + 1));
+		if (array[j] == NULL)
+		{
+			free(array);
+			return NULL;
+		}
+		int k = 0;
+		while (k < word_length)
+
+		{
+			array[j][k] = line[i - word_length + k];
+			k++;
+		}
+		array[j][k] = '\0';
+		j++;
 		i++;
 	}
-	array[i] = NULL;
 
-	return (array);
+	array[j] = NULL;
+	free(array);
+	return array;
+
 }
+
 
 /**
  * create_process - Creates a new process and executes the command

@@ -8,14 +8,16 @@
 #include <sys/wait.h>
 #include <sys/stat.h>
 #include <string.h>
+#include <errno.h>
 #define MAX_LINE 256
-
+#define MAX_INPUT 1024
+#define PROMPT "simple_shell> "
 extern char **environ;
 
 /* Prototypes */
 char *read_input(void);
 char **tokenize_input(char *buffer);
-void create_process(char* path, char** array);
+void create_process(char *path, char **array);
 int leading_slash_in_path(const char *str);
 char *get_executable_path(char *path, char *file_name);
 char *get_file_path(char *file_name);

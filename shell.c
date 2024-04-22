@@ -14,34 +14,36 @@ int main(void)
 	while (1)
 	{
 		if (isatty(STDIN_FILENO))
-			printf("\nuser@simple_shell$ ");
+			printf("\nuser@simple_shell$ ")
 
-		line = read_input();
+			line = read_input();
+		if (line == NULL)
+		{
+			free(line);
+			break;
+		}
+
 		array = tokenize_input(line);
+		if (array == NULL)
+		{
+			free(line);
+			continue;
+		}
 
 		if (strcmp(array[0], "exit") == 0)
 		{
 			free(line);
 			free(array);
-			exit(0);
+			break;
 		}
-		if (strcmp(array[0], "env") == 0)
 
+		if (execve(array[0], array, environ) == -1)
 		{
-
-			env(array);
-
+			perror("Error: ");
 			free(line);
-
 			free(array);
-
 			continue;
-
 		}
-		create_process(array[0], array);
-
-		free(line);
-		free(array);
 	}
 
 	return (0);
