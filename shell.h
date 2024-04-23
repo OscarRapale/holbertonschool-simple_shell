@@ -11,6 +11,7 @@
 #include <errno.h>
 #include <fcntl.h>
 
+extern char **environ;
 
 /* Prototypes */
 
