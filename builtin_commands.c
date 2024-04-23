@@ -105,7 +105,7 @@ int shell_exit(char **args, char *input)
 	}
 	else
 	{
-		handle_exit(input, 0);
+		handle_exit(input, 127);
 	}
 	return (1);
 }
