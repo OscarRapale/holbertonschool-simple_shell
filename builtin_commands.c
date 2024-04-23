@@ -23,10 +23,17 @@ void print_env(char **env)
 
 void handle_cd(char **args, int num_args)
 {
-	const char *home_dir, *prev_dir;
+	const char *home_dir = NULL, *prev_dir = NULL;
+	int i = 0;
 
-	home_dir = getenv("HOME");
-	prev_dir = getenv("OLDPWD");
+	while (environ[i] != NULL)
+	{
+		if (strncmp(environ[i], "HOME=", 5) == 0)
+			home_dir = &environ[i][5];
+		else if (strncmp(environ[i], "OLDPWD=", 7) == 0)
+			prev_dir = &environ[i][7];
+		i++;
+	}
 
 	if (num_args == 1 || strcmp(args[1], "~") == 0)
 	{

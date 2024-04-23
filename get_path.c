@@ -85,12 +85,21 @@ char *find_executable_path(char *path, char *file_name)
 
 char *get_file_path(char *file_name)
 {
-	char *path = getenv("PATH");
+	char *path = NULL;
 	char *full_path;
+	int i = 0;
 
+	while (environ[i] != NULL)
+	{
+		if (strncmp(environ[i], "PATH=", 5) == 0)
+		{
+			path = &environ[i][5];
+			break;
+		}
+		i++;
+	}
 	if (leading_slash_in_path(file_name) && access(file_name, X_OK) == 0)
 		return (strdup(file_name));
-
 	if (!path)
 	{
 		perror("Path not found");
