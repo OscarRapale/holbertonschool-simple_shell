@@ -103,6 +103,10 @@ int shell_exit(char **args, char *input)
 		}
 		handle_exit(input, exit_status);
 	}
+	else if (args[1] == NULL || strcmp(args[1], "0") == 0)
+	{
+		handle_exit(input, 0);
+	}
 	else
 	{
 		handle_exit(input, 127);
