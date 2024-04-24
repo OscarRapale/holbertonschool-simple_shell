@@ -67,6 +67,7 @@ void execute_command(char *input, char *argv[], char **env,
 	{
 		perror("Error: Failed to create");
 		free(input);
+		free(path);
 		exit(1);
 	}
 
