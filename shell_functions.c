@@ -55,6 +55,7 @@ void execute_command(char *input, char *argv[], char **env,
 
 	if (strcmp(args[0], "exit") == 0)
 	{
+		free(input);
 		shell_exit(args, shell_data);
 		return;
 	}
@@ -79,6 +80,8 @@ void execute_command(char *input, char *argv[], char **env,
 			write(2, ": 1: ", 5);
 			write(2, args[0], strlen(args[0]));
 			write(2, ": not found\n", 12);
+			free(input);
+			free(path);
 			exit(127);
 		}
 	}
