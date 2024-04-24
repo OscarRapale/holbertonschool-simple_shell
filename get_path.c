@@ -114,6 +114,10 @@ char *get_file_path(char *file_name)
 		write(2, ": 1: ", 5);
 		write(2, file_name, strlen(file_name));
 		write(2, ": not found\n", 12);
+
+		free(full_path);
+		free(file_name);
+
 		exit(127);
 		return (NULL);
 	}
