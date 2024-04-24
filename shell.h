@@ -19,7 +19,7 @@ extern char **environ;
 int leading_slash_in_path(char const *str);
 char *get_file_path(char *file_name);
 char *find_executable_path(char *path, char *file_name);
-void execute_command(char *input, char *argv[], char **env);
+int execute_command(char *input, char *argv[], char **env);
 char *read_input(void);
 int tokenize_input(char *input, char *args[]);
 char *handle_symbols(char *input);
