@@ -76,28 +76,27 @@ void handle_exit(char *input, int exit_status)
 
 /**
   * shell_exit - Handles the exit status
-  * @status: exit status code
-  * @is_exit_command: boolian to execute exit when needed
+  * @args: Arguments to the function
+  * @shell_data: exit status code
   *
   * Return: Status of exit, 1 if otherwise
   */
 
-void shell_exit(int status, bool is_exit_command)
+void shell_exit(char **args, shell_data_t *shell_data)
 {
+	int status;
 
-	if (WIFEXITED(status))
+	if (args[1] == NULL)
 	{
-		int exit_status = WEXITSTATUS(status);
-
-		if (is_exit_command)
-		{
-			exit(exit_status);
-		}
+		status = shell_data->last_exit_status;
 	}
 	else
 	{
-		printf("Unknown termination condition\n");
-		exit(1);
+		status = atoi(args[1]);
+		if (status < 0 || status > 255)
+		{
+			return;
+		}
 	}
+	exit(status);
 }
-

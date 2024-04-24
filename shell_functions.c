@@ -33,14 +33,16 @@ char *read_input(void)
   * @input: The argument from the buffer
   * @argv: Array of argument
   * @env: Environment variables
+  * @shell_data: exit status code
+  *
   */
 
-void execute_command(char *input, char *argv[], char **env)
+void execute_command(char *input, char *argv[], char **env,
+		shell_data_t *shell_data)
 {
 	char *args[10];
 	char *path, *shell_name;
-	int status = 0;
-	int num_args;
+	int status, num_args;
 	pid_t child_pid;
 
 	shell_name = argv[0];
@@ -50,11 +52,12 @@ void execute_command(char *input, char *argv[], char **env)
 		return;
 	if (builtin_commands(args, num_args, env) == 1)
 		return;
-	
-	if (strcmp(args[0], "exit") == 0) 
+
+	if (strcmp(args[0], "exit") == 0)
 	{
-        exit(status);
-    }
+		shell_exit(args, shell_data);
+		return;
+	}
 
 	path = get_file_path(args[0]);
 
@@ -80,8 +83,9 @@ void execute_command(char *input, char *argv[], char **env)
 	}
 	else
 	{
-		wait(&status);
-		shell_exit(status, false);
+		waitpid(child_pid, &status, 0);
+		if (WIFEXITED(status))
+			shell_data->last_exit_status = WEXITSTATUS(status);
 	}
 	free(path);
 }
@@ -117,7 +121,6 @@ int tokenize_input(char *input, char *args[])
   * builtin_commands - Handle all the built in commands
   * @args: Arguments to the built in commands
   * @num_args: Number of argument
-  * @input: The input command
   * @env: The environment variables
   *
   * Return: 1 if successful, 0 if unsuccessful
