@@ -33,9 +33,12 @@ char *read_input(void)
   * @input: The argument from the buffer
   * @argv: Array of argument
   * @env: Environment variables
+  * @shell_data: exit status code
+  *
   */
 
-void execute_command(char *input, char *argv[], char **env)
+void execute_command(char *input, char *argv[], char **env,
+		shell_data_t *shell_data)
 {
 	char *args[10];
 	char *path, *shell_name;
@@ -47,8 +50,16 @@ void execute_command(char *input, char *argv[], char **env)
 
 	if (num_args == 0)
 		return;
-	if (builtin_commands(args, num_args, input, env) == 1)
+	if (builtin_commands(args, num_args, env) == 1)
 		return;
+
+	if (strcmp(args[0], "exit") == 0)
+	{
+		free(input);
+		shell_exit(args, shell_data);
+		return;
+	}
+
 	path = get_file_path(args[0]);
 
 	child_pid = fork();
@@ -57,6 +68,7 @@ void execute_command(char *input, char *argv[], char **env)
 	{
 		perror("Error: Failed to create");
 		free(input);
+		free(path);
 		exit(1);
 	}
 
@@ -68,12 +80,17 @@ void execute_command(char *input, char *argv[], char **env)
 			write(2, ": 1: ", 5);
 			write(2, args[0], strlen(args[0]));
 			write(2, ": not found\n", 12);
+			free(input);
+			free(path);
 			exit(127);
 		}
 	}
 	else
-		wait(&status);
-
+	{
+		waitpid(child_pid, &status, 0);
+		if (WIFEXITED(status))
+			shell_data->last_exit_status = WEXITSTATUS(status);
+	}
 	free(path);
 }
 
@@ -108,19 +125,14 @@ int tokenize_input(char *input, char *args[])
   * builtin_commands - Handle all the built in commands
   * @args: Arguments to the built in commands
   * @num_args: Number of argument
-  * @input: The input command
   * @env: The environment variables
   *
   * Return: 1 if successful, 0 if unsuccessful
   */
 
-int builtin_commands(char **args, int num_args,  char *input, char **env)
+int builtin_commands(char **args, int num_args, char **env)
 {
-	if (strcmp(args[0], "exit") == 0)
-	{
-		return (shell_exit(args, input));
-	}
-	else if (strcmp(args[0], "cd") == 0)
+	if (strcmp(args[0], "cd") == 0)
 	{
 		handle_cd(args, num_args);
 		return (1);
@@ -130,7 +142,6 @@ int builtin_commands(char **args, int num_args,  char *input, char **env)
 		print_env(env);
 		return (1);
 	}
-
 	return (0);
 }
 
