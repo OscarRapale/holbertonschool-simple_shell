@@ -35,21 +35,26 @@ char *read_input(void)
   * @env: Environment variables
   */
 
-int execute_command(char *input, char *argv[], char **env)
+void execute_command(char *input, char *argv[], char **env)
 {
 	char *args[10];
 	char *path, *shell_name;
-	int status, num_args;
+	int status = 0;
+	int num_args;
 	pid_t child_pid;
-	int exit_status = 0;
 
 	shell_name = argv[0];
 	num_args = tokenize_input(input, args);
 
 	if (num_args == 0)
-		return (exit_status);
-	if (builtin_commands(args, num_args, input, env) == 1)
-		return (exit_status);
+		return;
+	if (builtin_commands(args, num_args, env) == 1)
+		return;
+	
+	if (strcmp(args[0], "exit") == 0) 
+	{
+        exit(status);
+    }
 
 	path = get_file_path(args[0]);
 
@@ -75,14 +80,10 @@ int execute_command(char *input, char *argv[], char **env)
 	}
 	else
 	{
-		waitpid(child_pid, &status, 0);
-		if (WIFEXITED(status))
-		{
-			exit_status = WEXITSTATUS(status);
-		}
+		wait(&status);
+		shell_exit(status, false);
 	}
 	free(path);
-	return (exit_status);
 }
 
 /**
@@ -122,13 +123,9 @@ int tokenize_input(char *input, char *args[])
   * Return: 1 if successful, 0 if unsuccessful
   */
 
-int builtin_commands(char **args, int num_args,  char *input, char **env)
+int builtin_commands(char **args, int num_args, char **env)
 {
-	if (strcmp(args[0], "exit") == 0)
-	{
-		return (shell_exit(args, input));
-	}
-	else if (strcmp(args[0], "cd") == 0)
+	if (strcmp(args[0], "cd") == 0)
 	{
 		handle_cd(args, num_args);
 		return (1);
@@ -138,7 +135,6 @@ int builtin_commands(char **args, int num_args,  char *input, char **env)
 		print_env(env);
 		return (1);
 	}
-
 	return (0);
 }
 
