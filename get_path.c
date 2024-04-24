@@ -30,6 +30,18 @@ char *find_executable_path(char *path, char *file_name)
 	struct stat file_path;
 	char *path_buffer = NULL;
 
+	if (strncmp(file_name, "./", 2) == 0)
+	{
+		if (stat(file_name, &file_path) == 0 && access(file_name, X_OK) == 0)
+		{
+			return strdup(file_name);
+		}
+		else
+		{
+			return NULL;
+		}
+	}
+
 	path_copy = strdup(path);
 	token = strtok(path_copy, ":");
 
@@ -73,12 +85,21 @@ char *find_executable_path(char *path, char *file_name)
 
 char *get_file_path(char *file_name)
 {
-	char *path = getenv("PATH");
+	char *path = NULL;
 	char *full_path;
+	int i = 0;
 
+	while (environ[i] != NULL)
+	{
+		if (strncmp(environ[i], "PATH=", 5) == 0)
+		{
+			path = &environ[i][5];
+			break;
+		}
+		i++;
+	}
 	if (leading_slash_in_path(file_name) && access(file_name, X_OK) == 0)
 		return (strdup(file_name));
-
 	if (!path)
 	{
 		perror("Path not found");
@@ -88,12 +109,7 @@ char *get_file_path(char *file_name)
 
 	if (full_path == NULL)
 	{
-		write(2, file_name, strlen(file_name));
-		write(2, ": command not found", 19);
-		return (NULL);
+		return(NULL);
 	}
 	return (full_path);
 }
-
-
-

@@ -1,164 +1,156 @@
 #include "shell.h"
 
 /**
- * read_input - Reads input from the user
- *
- * Return: A pointer to the buffer where the input is stored
- */
+  * read_input - Reads the input from the users
+  *
+  * Return: Character variable to the program
+  */
 
 char *read_input(void)
 {
-	char *buffer = NULL;
-	size_t n = 0;
-	ssize_t read;
+	char *buffer;
+	size_t buf_size;
+	ssize_t nread;
 
-	read = getline(&buffer, &n, stdin);
+	buffer = NULL;
+	buf_size = 0;
+	nread = getline(&buffer, &buf_size, stdin);
 
-	if (read == -1)
+	if (nread == -1)
 	{
+		free(buffer);
 		exit(0);
 	}
+
+	buffer = handle_symbols(buffer);
+
 	return (buffer);
 }
 
-/**
- * tokenize_input - Tokenizes the input into an array of strings
- * @buffer: The input to tokenize
- *
- * Return: A pointer to the array of strings
- */
-
-char **tokenize_input(char *buffer)
-{
-	char **array;
-	int i = 0;
-	int j = 0;
-	int word_count = 0;
-
-	while (line[i] != '\0')
-
-    {
-	    if (line[i] == ' ')
-
-        {
-		i++;
-		continue;
-
-        }
-	word_count++;
-	while (line[i] != ' ' && line[i] != '\0')
-
-        {
-		i++;
-
-        }
-
-    }
-	array = malloc(sizeof(char *) * (word_count + 1));
-	if (array == NULL)
-
-	{
-		return NULL;
-
-	}
-	i = 0;
-	j = 0;
-	while (line[i] != '\0')
-
-	{
-		if (line[i] == ' ')
-
-		{
-			i++;
-			continue;
-
-		}
-		int word_length = 0;
-		while (line[i] != ' ' && line[i] != '\0')
-
-		{
-			word_length++;
-			i++;
-
-		}
-		array[j] = malloc(sizeof(char) * (word_length + 1));
-		if (array[j] == NULL)
-		{
-			free(array);
-			return NULL;
-		}
-		int k = 0;
-		while (k < word_length)
-
-		{
-			array[j][k] = line[i - word_length + k];
-			k++;
-		}
-		array[j][k] = '\0';
-		j++;
-		i++;
-	}
-
-	array[j] = NULL;
-	free(array);
-	return array;
-
-}
-
 
 /**
- * create_process - Creates a new process and executes the command
- * @path: The path to the executable
- * @array: The array of arguments
- */
+  * execute_command - Executes the input from the buffer
+  * @input: The argument from the buffer
+  * @argv: Array of argument
+  * @env: Environment variables
+  */
 
-void create_process(char *path, char **array)
+void execute_command(char *input, char *argv[], char **env)
 {
+	char *args[10];
+	char *path, *shell_name;
+	int status, num_args;
 	pid_t child_pid;
-	int status;
+
+	shell_name = argv[0];
+	num_args = tokenize_input(input, args);
+
+	if (num_args == 0)
+		return;
+	if (builtin_commands(args, num_args, input, env) == 1)
+		return;
+	path = get_file_path(args[0]);
 
 	child_pid = fork();
 
 	if (child_pid == -1)
 	{
-		perror("Failed to create.");
-		exit(41);
+		perror("Error: Failed to create");
+		free(input);
+		exit(1);
 	}
 
 	if (child_pid == 0)
 	{
-		if (execve(path, array, NULL) == -1)
+		if (execve(path, args, NULL) == -1)
 		{
-			exit(97);
+			write(2, shell_name, strlen(shell_name));
+			write(2, ": 1: ", 5);
+			write(2, args[0], strlen(args[0]));
+			write(2, ": not found\n", 12);
+			exit(127);
 		}
 	}
 	else
-	{
 		wait(&status);
-	}
+
+	free(path);
 }
 
 /**
- * env - Prints the current environment
- *
- * @array: Array of arguments passed to the function
- */
+  * tokenize_input - Tokenizes the input strings
+  * @input: Argument input
+  * @args: The array of strings
+  *
+  * Return: Number of the items tokenized
+  */
 
-
-void env(char **array)
-
+int tokenize_input(char *input, char *args[])
 {
+	int count;
+	char *token;
 
-	int i;
+	count = 0;
+	token = strtok(input, " \n");
 
+	while (token)
+	{
+		args[count] = token;
+		token = strtok(NULL, " \n");
+		count++;
+	}
 
-	if (array == NULL)
+	args[count] = NULL;
+	return (count);
+}
 
-		return;
+/**
+  * builtin_commands - Handle all the built in commands
+  * @args: Arguments to the built in commands
+  * @num_args: Number of argument
+  * @input: The input command
+  * @env: The environment variables
+  *
+  * Return: 1 if successful, 0 if unsuccessful
+  */
 
+int builtin_commands(char **args, int num_args,  char *input, char **env)
+{
+	if (strcmp(args[0], "exit") == 0)
+	{
+		return (shell_exit(args, input));
+	}
+	else if (strcmp(args[0], "cd") == 0)
+	{
+		handle_cd(args, num_args);
+		return (1);
+	}
+	else if (strcmp(args[0], "env") == 0)
+	{
+		print_env(env);
+		return (1);
+	}
 
-	for (i = 0; environ[i] != NULL; i++)
+	return (0);
+}
 
-		printf("%s\n", environ[i]);
+/**
+  * handle_symbols - Handles the '#' in the input
+  * @input: Input value
+  *
+  * Return: The stripped down input
+  */
 
+char *handle_symbols(char *input)
+{
+	char *comment_pos;
+
+	comment_pos = strstr(input, " #");
+
+	if (comment_pos)
+	{
+		*comment_pos = '\0';
+	}
+
+	return (input);
 }

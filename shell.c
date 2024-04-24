@@ -1,49 +1,27 @@
 #include "shell.h"
 
 /**
- * main - Entry point and main loop of shell
- *
- * Return: 0 on success
- */
+  * main - main loop
+  * @argc: Argumnt count
+  * @argv: Array of arguments
+  * @env: Environment variable
+  *
+  * Return: O Always succes
+  */
 
-int main(void)
+int main(int argc, char *argv[], char **env)
 {
-	char *line;
-	char **array;
+	char *buffer;
+	(void)argc;
 
 	while (1)
 	{
 		if (isatty(STDIN_FILENO))
-			printf("\nuser@simple_shell$ ")
+			printf("user@simple_shell$ ");
 
-			line = read_input();
-		if (line == NULL)
-		{
-			free(line);
-			break;
-		}
-
-		array = tokenize_input(line);
-		if (array == NULL)
-		{
-			free(line);
-			continue;
-		}
-
-		if (strcmp(array[0], "exit") == 0)
-		{
-			free(line);
-			free(array);
-			break;
-		}
-
-		if (execve(array[0], array, environ) == -1)
-		{
-			perror("Error: ");
-			free(line);
-			free(array);
-			continue;
-		}
+		buffer = read_input();
+		execute_command(buffer, argv, env);
+		free(buffer);
 	}
 
 	return (0);
