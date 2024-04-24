@@ -35,20 +35,22 @@ char *read_input(void)
   * @env: Environment variables
   */
 
-void execute_command(char *input, char *argv[], char **env)
+int execute_command(char *input, char *argv[], char **env)
 {
 	char *args[10];
 	char *path, *shell_name;
 	int status, num_args;
 	pid_t child_pid;
+	int exit_status = 0;
 
 	shell_name = argv[0];
 	num_args = tokenize_input(input, args);
 
 	if (num_args == 0)
-		return;
+		return (exit_status);
 	if (builtin_commands(args, num_args, input, env) == 1)
-		return;
+		return (exit_status);
+
 	path = get_file_path(args[0]);
 
 	child_pid = fork();
@@ -72,9 +74,15 @@ void execute_command(char *input, char *argv[], char **env)
 		}
 	}
 	else
-		wait(&status);
-
+	{
+		waitpid(child_pid, &status, 0);
+		if (WIFEXITED(status))
+		{
+			exit_status = WEXITSTATUS(status);
+		}
+	}
 	free(path);
+	return (exit_status);
 }
 
 /**
