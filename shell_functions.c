@@ -61,6 +61,10 @@ void execute_command(char *input, char *argv[], char **env,
 	}
 
 	path = get_file_path(args[0]);
+	if (path == NULL)
+	{
+    	exit(127);
+	}
 
 	child_pid = fork();
 
@@ -77,9 +81,9 @@ void execute_command(char *input, char *argv[], char **env,
 		if (execve(path, args, NULL) == -1)
 		{
 			write(2, shell_name, strlen(shell_name));
-			write(2, ": 1: ", 5);
-			write(2, args[0], strlen(args[0]));
-			write(2, ": not found\n", 12);
+    		write(2, ": 1: ", 5);
+    		write(2, args[0], strlen(args[0]));
+    		write(2, ": not found\n", 12);
 			free(input);
 			free(path);
 			exit(127);
