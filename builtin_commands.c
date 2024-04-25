@@ -77,35 +77,26 @@ void handle_exit(char *input, int exit_status)
 /**
   * shell_exit - Handles the exit status
   * @args: Arguments to the function
-  * @input: Checks the status of exit
+  * @shell_data: exit status code
   *
   * Return: Status of exit, 1 if otherwise
   */
 
-int shell_exit(char **args, char *input)
+void shell_exit(char **args, shell_data_t *shell_data)
 {
-	char *status_str;
-	int exit_status, i;
+	int status;
 
-	if (args[1] != NULL)
+	if (args[1] == NULL)
 	{
-		exit_status = 0;
-		status_str = args[1];
-
-		for (i = 0; status_str[i] != '\0'; i++)
-		{
-			if (status_str[i] < '0' || status_str[i] > '9')
-			{
-				handle_exit(input, 2);
-				return (1);
-			}
-			exit_status = exit_status * 10 + (status_str[i] - '0');
-		}
-		handle_exit(input, exit_status);
+		status = shell_data->last_exit_status;
 	}
 	else
 	{
-		handle_exit(input, 0);
+		status = atoi(args[1]);
+		if (status < 0 || status > 255)
+		{
+			return;
+		}
 	}
-	return (1);
+	exit(status);
 }

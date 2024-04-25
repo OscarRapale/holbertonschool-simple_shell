@@ -12,7 +12,9 @@
 int main(int argc, char *argv[], char **env)
 {
 	char *buffer;
+	shell_data_t shell_data = {0};
 	(void)argc;
+	
 
 	while (1)
 	{
@@ -20,7 +22,7 @@ int main(int argc, char *argv[], char **env)
 			printf("user@simple_shell$ ");
 
 		buffer = read_input();
-		execute_command(buffer, argv, env);
+		execute_command(buffer, argv, env, &shell_data);
 		free(buffer);
 	}
 

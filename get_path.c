@@ -34,11 +34,11 @@ char *find_executable_path(char *path, char *file_name)
 	{
 		if (stat(file_name, &file_path) == 0 && access(file_name, X_OK) == 0)
 		{
-			return strdup(file_name);
+			return (strdup(file_name));
 		}
 		else
 		{
-			return NULL;
+			return (NULL);
 		}
 	}
 
@@ -87,6 +87,7 @@ char *get_file_path(char *file_name)
 {
 	char *path = NULL;
 	char *full_path;
+	char *shell_name = "./hsh";
 	int i = 0;
 
 	while (environ[i] != NULL)
@@ -101,16 +102,22 @@ char *get_file_path(char *file_name)
 	if (leading_slash_in_path(file_name) && access(file_name, X_OK) == 0)
 		return (strdup(file_name));
 	if (!path)
-	{
-		perror("Path not found");
+	{	
+		write(2, shell_name, strlen(shell_name));
+		write(2, ": 1: ", 5);
+		write(2, file_name, strlen(file_name));
+		write(2, ": not found\n", 12);
 		return (NULL);
 	}
 	full_path = find_executable_path(path, file_name);
 
 	if (full_path == NULL)
 	{
+		write(2, shell_name, strlen(shell_name));
+		write(2, ": 1: ", 5);
 		write(2, file_name, strlen(file_name));
-		write(2, ": command not found", 19);
+		write(2, ": not found\n", 12);
+
 		return (NULL);
 	}
 	return (full_path);
