@@ -64,10 +64,11 @@ void execute_command(char *input, char *argv[], char **env,
 	if (path == NULL)
 	{
 		free(input);
-		for (i = 0; i < num_args; i++)
+		for (i = 1; i < num_args; i++)
 		{
 			free(args[i]);
 		}
+		args[0] = NULL;
     	exit(127);
 	}
 
