@@ -42,7 +42,7 @@ void execute_command(char *input, char *argv[], char **env,
 {
 	char *args[10];
 	char *path, *shell_name;
-	int status, num_args;
+	int status, num_args, i;
 	pid_t child_pid;
 
 	shell_name = argv[0];
@@ -63,6 +63,11 @@ void execute_command(char *input, char *argv[], char **env,
 	path = get_file_path(args[0]);
 	if (path == NULL)
 	{
+		free(input);
+		for (i = 0; i < num_args; i++)
+		{
+			free(args[i]);
+		}
     	exit(127);
 	}
 
