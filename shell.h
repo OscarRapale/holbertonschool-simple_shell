@@ -11,7 +11,6 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <stdbool.h>
-#define MAX_PATH_SIZE 4096
 
 extern char **environ;
 
@@ -36,9 +35,6 @@ void execute_command(char *input, char *argv[],
 char *read_input(void);
 int tokenize_input(char *input, char *args[]);
 char *handle_symbols(char *input);
-void fork_and_exec(char *path, char **args);
-void handle_command(char **args, shell_data_t *shell_data);
-
 
 /* Built-in functions */
 int builtin_commands(char **args, int num_args, char **env);
