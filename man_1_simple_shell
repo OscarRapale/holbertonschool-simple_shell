@@ -1,0 +1,43 @@
+.TH "HSH" 1 "18 April 2024" "1.0" "Simple Shell"
+.SH NAME
+hsh - command interpreter (shell)
+.SH SYNOPSIS
+hsh (does not support arguments)
+.SH DESCRIPTION
+Simple shell (hsh) is a command-line interpreter that executes commands read from the standard input or from a file. Made by Holberton School Students.
+.SH OVERVIEW
+The shell reads lines from either a file or the terminal, interprets them, and generally executes other commands. It has both interactive and non-interactive modes. In the interactive mode, commands can be typed directly into the running shell. In the non-interactive mode, commands can be put into a file, and the file can be executed directly by the shell.
+.SH SEARCH AND EXECUTION
+There are three types of commands: shell functions, built-in commands, and normal programs. Each is executed differently:
+- **Shell built-ins**: Executed internally to the shell without spawning a new process.
+- **Normal programs**: Searched for in the file system.
+- **Shell functions**: First checked by name, then searched as normal programs if not found.
+.SH PATH SEARCH
+When locating a command, the shell follows these steps:
+1. Looks for a shell function with the same name.
+2. Searches for a built-in command with the same name.
+3. If neither is found, it searches each entry in the PATH environment variable for the command. The PATH variable contains a series of directories separated by colons. The current directory may be indicated implicitly by an empty directory name or explicitly by a single period.
+.SH COMMAND EXIT STATUS
+Each command has an exit status.
+.SH BUILT-INS
+This section lists the built-in commands that perform operations not achievable by separate processes:
+.TP
+.I exit
+Exits the shell.
+.TP
+.I env
+Prints the current environment.
+.TP
+.I cd
+Changes the current directory.
+.SS Environment
+PATH' The default search path for executables.
+
+PWD' The logical value of the current working directory. This is set by the cd command.
+
+OLDPWD' The previous logical value of the current working directory. This is set by the cd command.
+.SH SEE ALSO
+dash(1)
+.SH BUGS
+Not known.
+.SH AUTHORS: Julio Perez, Oscar Rapale, and Joshua Maldonado
